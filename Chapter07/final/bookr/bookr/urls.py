@@ -23,5 +23,5 @@ import reviews.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('reviews.urls')),
-    path('book-search/', reviews.views.book_search),
+    path('book-search/', reviews.views.book_search, name='book_search'),
 ]
