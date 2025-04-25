@@ -101,10 +101,10 @@ def publisher_edit(request, pk=None):
             updated_publisher = form.save()
             if publisher is None:
                 messages.success(request,
-                                 'Publisher "{updated_publisher}" was created.')
+                                 f'Publisher "{updated_publisher}" was created.')
             else:
                 messages.success(request,
-                                 'Publisher "{updated_publisher}" was updated.')
+                                 f'Publisher "{updated_publisher}" was updated.')
 
             return redirect("publisher_edit", updated_publisher.pk)
     else:
@@ -137,10 +137,10 @@ def review_edit(request, book_pk, review_pk=None):
             updated_review.book = book
 
             if review is None:
-                messages.success(request, 'Review for "{book}" created.')
+                messages.success(request, f'Review for "{book}" created.')
             else:
                 updated_review.date_edited = timezone.now()
-                messages.success(request, 'Review for "{book}" updated.')
+                messages.success(request, f'Review for "{book}" updated.')
 
             updated_review.save()
             return redirect("book_detail", book.pk)

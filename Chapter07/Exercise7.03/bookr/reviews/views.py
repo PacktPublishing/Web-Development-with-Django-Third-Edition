@@ -100,10 +100,10 @@ def publisher_edit(request, pk=None):
             updated_publisher = form.save()
             if publisher is None:
                 messages.success(request,
-                                 'Publisher "{updated_publisher}" was created.')
+                                 f'Publisher "{updated_publisher}" was created.')
             else:
                 messages.success(request,
-                                 'Publisher "{updated_publisher}" was updated.')
+                                 f'Publisher "{updated_publisher}" was updated.')
 
             return redirect("publisher_edit", updated_publisher.pk)
     else:
