@@ -1,0 +1,162 @@
+Only in bookr/bookr: __pycache__
+diff -ur bookr/bookr/settings.py /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/bookr/settings.py
+--- bookr/bookr/settings.py	2025-04-22 14:21:11.799399001 +1000
++++ /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/bookr/settings.py	2025-03-20 10:09:26.585990400 +1100
+@@ -122,5 +122,3 @@
+ # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+ 
+ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+-MEDIA_ROOT = BASE_DIR / 'media'
+-MEDIA_URL = '/media/'
+diff -ur bookr/bookr/urls.py /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/bookr/urls.py
+--- bookr/bookr/urls.py	2025-04-22 14:25:37.738083521 +1000
++++ /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/bookr/urls.py	2025-04-22 12:24:55.394038526 +1000
+@@ -15,8 +15,6 @@
+     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+ """
+ from django.contrib import admin
+-from django.conf import settings
+-from django.conf.urls.static import static
+ from django.urls import include, path
+ 
+ import reviews.views
+@@ -27,6 +25,3 @@
+     path('', include('reviews.urls')),
+     path('book-search/', reviews.views.book_search, name='book_search'),
+ ]
+-if settings.DEBUG:
+-    urlpatterns += static(settings.MEDIA_URL,
+-    document_root=settings.MEDIA_ROOT)
+Only in bookr: cg.diff
+Only in bookr: db.00.sqlite3
+Only in bookr: db.ch06.sqlite3
+Only in bookr: db.sqlite3
+Only in bookr: __pycache__
+diff -ur bookr/reviews/forms.py /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/forms.py
+--- bookr/reviews/forms.py	2025-04-22 23:15:13.576194913 +1000
++++ /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/forms.py	2025-04-24 14:38:45.457296275 +1000
+@@ -1,6 +1,6 @@
+ from django import forms
+ 
+-from .models import Publisher, Review, Book
++from .models import Publisher, Review
+ 
+ 
+ class SearchForm(forms.Form):
+@@ -22,10 +22,3 @@
+         exclude = ["date_edited", "book"]
+ 
+     rating = forms.IntegerField(min_value=0, max_value=5)
+-
+-
+-class BookMediaForm(forms.ModelForm):
+-    class Meta:
+-        model = Book
+-        fields = ["cover", "sample"]
+-
+Only in bookr/reviews/migrations: 0002_book_cover_book_sample.py
+Only in bookr/reviews/migrations: __pycache__
+diff -ur bookr/reviews/models.py /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/models.py
+--- bookr/reviews/models.py	2025-04-22 14:27:10.679525295 +1000
++++ /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/models.py	2025-02-26 13:31:38.218059526 +1100
+@@ -26,8 +26,6 @@
+                                   on_delete=models.CASCADE)
+     contributors = models.ManyToManyField('Contributor',
+                                           through="BookContributor")
+-    cover = models.ImageField(null=True, blank=True, upload_to="book_covers/")
+-    sample = models.FileField(null=True, blank=True, upload_to="book_samples/")
+ 
+     def __str__(self):
+         return f"{self.title} ({self.isbn})"
+Only in bookr/reviews: __pycache__
+diff -ur bookr/reviews/templates/reviews/instance-form.html /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/templates/reviews/instance-form.html
+--- bookr/reviews/templates/reviews/instance-form.html	2025-04-22 16:49:54.603896114 +1000
++++ /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/templates/reviews/instance-form.html	2025-04-03 14:29:59.275307949 +1100
+@@ -14,8 +14,7 @@
+     New {{ model_type }}
+     {% endif %}
+ </h2>
+-<form method="post" {% if is_file_upload %}
+-  enctype="multipart/form-data"{% endif %}>
++<form method="post">
+     {% csrf_token %}
+     {{ form.as_p }}
+     <button type="submit" class="btn btn-primary">
+diff -ur bookr/reviews/urls.py /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/urls.py
+--- bookr/reviews/urls.py	2025-04-23 22:22:30.708275161 +1000
++++ /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/urls.py	2025-04-03 13:00:09.507210819 +1100
+@@ -6,7 +6,6 @@
+ urlpatterns = [
+     path('books/', views.book_list, name='book_list'),
+     path('books/<int:pk>', views.book_detail, name='book_detail'),
+-    path('books/<int:pk>/media/', views.book_media, name='book_media'),
+     path("publishers/<int:pk>/", views.publisher_edit, name="publisher_edit"),
+     path("publishers/new/", views.publisher_edit, name="publisher_create"),
+ ]
+diff -ur bookr/reviews/views.py /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/views.py
+--- bookr/reviews/views.py	2025-04-23 23:36:56.190575015 +1000
++++ /home/chris/apps/Web-Development-with-Django-Third-Edition/Chapter07/final/bookr/reviews/views.py	2025-04-24 23:08:40.078763579 +1000
+@@ -1,16 +1,12 @@
+-from io import BytesIO
+-
+-from PIL import Image
+ from django.contrib import messages
+-from django.core.files.images import ImageFile
+ from django.shortcuts import render, get_object_or_404, redirect
++from django.utils import timezone
+ 
+-from .forms import PublisherForm, SearchForm, ReviewForm, BookMediaForm
++from .forms import SearchForm, PublisherForm, ReviewForm
+ from .models import Book, Contributor, Publisher, Review
+ from .utils import average_rating
+ 
+ 
+-
+ def index(request):
+     return render(request, "base.html")
+ 
+@@ -141,10 +137,10 @@
+             updated_review.book = book
+ 
+             if review is None:
+-                messages.success(request, f'Review for "{book}" created.')
++                messages.success(request, 'Review for "{book}" created.')
+             else:
+                 updated_review.date_edited = timezone.now()
+-                messages.success(request, f'Review for "{book}" updated.')
++                messages.success(request, 'Review for "{book}" updated.')
+ 
+             updated_review.save()
+             return redirect("book_detail", book.pk)
+@@ -162,30 +158,3 @@
+             "related_model_type": "Book",
+         },
+     )
+-
+-    
+-def book_media(request, pk):
+-    book = get_object_or_404(Book, pk=pk)
+-
+-    if request.method == "POST":
+-        form = BookMediaForm(request.POST,
+-        request.FILES, instance=book)
+-
+-    if form.is_valid():
+-        book = form.save(False)
+-        cover = form.cleaned_data.get("cover")
+-        if cover:
+-            image = Image.open(cover)
+-            image.thumbnail((300, 300))
+-            image_data = BytesIO()
+-            image.save(fp=image_data,
+-            format=cover.image.format)
+-            image_file = ImageFile(image_data)
+-            book.cover.save(cover.name, image_file)
+-            book.save()
+-            messages.success(request, f"Book {book} was successfully updated.")
+-        return redirect("book_detail", book.pk)
+-    else:
+-        form = BookMediaForm(instance=book)
+-    return render(request, "reviews/instance-form.html",
+-                  {"instance": book, "form": form, "model_type": "Book", "is_file_upload":True})
+Only in bookr/reviews: .views.py.swp
