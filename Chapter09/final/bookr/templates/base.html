@@ -28,7 +28,12 @@
               </li>
               {% if user.is_authenticated %}
                 <li class="nav-item">
-                  <a class="nav-link" href="/accounts/logout">Logout</a>
+		  <form id="logout-form" method="post" action="/accounts/logout/">
+                    {% csrf_token %}
+                    <button id="logout-btn" class="btn btn-link nav-link btn-lg" type="submit">
+			    <span style="font-size:larger">Logout</span>
+		    </button>
+		  </form>
                 </li>
               {% else %}
                 <li class="nav-item">
