@@ -1,0 +1,6 @@
+  {% for review_id, book_title in books_reviews %}
+    <a href="/reviews/{{ review_id }}">{{ book_title }}</a>
+    <br>
+  {% empty %}
+      No reviews found.
+  {% endfor %}

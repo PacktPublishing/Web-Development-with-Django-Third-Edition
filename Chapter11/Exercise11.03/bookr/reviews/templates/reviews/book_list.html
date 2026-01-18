@@ -1,0 +1,11 @@
+{% extends 'reviews/base.html' %}
+
+{% load inclusion_tag %}
+
+{% block content %}
+<ul class="list-group">
+  {% for item in book_list %}
+  {% book_list_item item %}
+  {% endfor %}
+</ul>
+{% endblock %}

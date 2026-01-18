@@ -1,0 +1,13 @@
+<html>
+<head>
+  <title>Delete Book Record</title>
+</head>
+<body>
+  <p>Delete Book Record</p>
+  <form method="POST">
+    {% csrf_token %}
+    Do you want to delete the book record?
+    <input type="submit" value="Delete record" />
+  </form>
+</body>
+</html>
