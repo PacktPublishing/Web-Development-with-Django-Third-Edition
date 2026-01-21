@@ -1,0 +1,33 @@
+<html>
+ <head>
+   <title>Bookr - {{ book.title }} </title>
+ </head>
+ <body>
+   <img src="/static/reviews/logo.png">
+   <div>
+       <h1>{{ book.title }}</h1>
+       <p>Published: {{ book.publication_date }}</p>
+       <p>ISBN: {{ book.isbn }}</p>
+       <p>Publisher: {{ book.publisher.name}} </p>
+       <p>{% if book.contributors.all %}By {% endif %}
+          {% for contributor in book.contributors.all %}
+             {{ contributor.first_names }} 
+             {{ contributor.last_names }} {% endfor %}</p>
+   </div>
+   <div ><img src="/media/{{ book.cover }}" /></div>
+   <div>
+     {% if reviews %}
+     <h2>Reviews:</h2>
+     {% endif %}
+     {% for review in reviews %}
+        <p class="review-content" >{{review.content }}</p >
+        <p class="review-creator">
+          {{ review.creator.username }}
+          {{ review.rating_to_stars }}</p>
+        <p class="review-date">{{ review.date_edited }}</p>
+     {% empty %}
+     <h2> No reviews </h2>
+     {% endfor %}
+   </div>
+ </body>
+</html>

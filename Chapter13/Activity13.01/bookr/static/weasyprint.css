@@ -1,0 +1,6 @@
+.stars { text-align: right; }
+
+#logoheader { background-color: palegoldenrod; padding: 20px }
+#bookinfo { float: left; }
+#bookcover { clear: both; }
+#histogram { float: right; background-color: lightgray ; color: white; }
