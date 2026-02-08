@@ -1,0 +1,9 @@
+{% if reviews_by_title %}
+Here is your {{period}} report of Bookr reviews {% if period == 'daily' %}on {{start_day_fmt}}.{% else %}from {{start_day_fmt}} to {{end_day_fmt}}.{% endif %}
+{% endif %}
+{% for title, reviews in reviews_by_title %}{{ title }} {{ reviews|length }}
+{% for review in reviews %} * {{ review.creator.username }} - {{ review.rating }}/5 - {{ site }}/reviews/{{ review.id }}
+{% endfor %}
+{% empty %}
+No reviews for {% if period == 'daily' %}{{start_day_fmt}}.{% else %} the period {{start_day_fmt}} to {{end_day_fmt}}.{% endif %}
+{% endfor %}

@@ -1,0 +1,7 @@
+__pycache__/
+*.sqlite3
+.idea/
+.vscode/
+.DS_Store
+.env
+settings.ini

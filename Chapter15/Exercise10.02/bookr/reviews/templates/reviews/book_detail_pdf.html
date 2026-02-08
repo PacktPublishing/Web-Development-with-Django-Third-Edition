@@ -1,0 +1,52 @@
+<html>
+ <head>
+   <title>Bookr - {{ book.title }} </title>
+ </head>
+ <body>
+
+   <div id="logoheader">
+     <img src="/static/reviews/logo.png">
+   </div>
+
+   <div id="title">
+       <h1>{{ book.title }}</h1>
+   </div>
+
+   <div id="histogram">
+     <table>
+     {% for stars, count in book_rating_histogram %}
+       <tr><td class="stars">{{ stars }}</td><td>{{ count }}</td></tr>
+     {% endfor %}
+     </table>
+   </div>
+
+   <div id="bookinfo">
+       <p>Published: {{ book.publication_date }}</p>
+       <p>ISBN: {{ book.isbn }}</p>
+       <p>Publisher: {{ book.publisher.name}} </p>
+       <p>{% if book.contributors.all %}By {% endif %}
+          {% for contributor in book.contributors.all %}
+             {{ contributor.first_names }} 
+             {{ contributor.last_names }} {% endfor %}</p>
+   </div>
+
+   <div id="bookcover">
+	  <img src="/media/{{ book.cover }}" />
+   </div>
+
+   <div id="reviews">
+     {% if reviews %}
+     <h2>Reviews:</h2>
+     {% endif %}
+     {% for review in reviews %}
+        <p class="review-content" >{{review.content }}</p >
+        <p class="review-creator">
+          {{ review.creator.username }}
+          {{ review.rating_to_stars }}</p>
+        <p class="review-date">{{ review.date_edited }}</p>
+     {% empty %}
+     <h2> No reviews </h2>
+     {% endfor %}
+   </div>
+ </body>
+</html>
